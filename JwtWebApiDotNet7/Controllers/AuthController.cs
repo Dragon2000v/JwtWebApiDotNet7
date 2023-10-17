@@ -1,4 +1,5 @@
 ﻿using JwtWebApiDotNet7.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -14,12 +15,31 @@ namespace JwtWebApiDotNet7.Controllers
     {
         public static User user = new User();
         private readonly IConfiguration _configuration;
+        //private readonly IUserService _userService;
 
 
-        public AuthController(IConfiguration configuration)
+        public AuthController(IConfiguration configuration/*, IUserService userService*/)
         {
             _configuration = configuration;
+            /*_userService = userService;*/
         }
+
+/*
+        [HttpGet, Authorize]
+        public ActionResult<string> GetMyName()
+        {
+            return Ok(_userService.GetMyName());
+
+            //var userName = User?.Identity?.Name;
+            //var roleClaims = User?.FindAll(ClaimTypes.Role);
+            //var roles = roleClaims?.Select(c => c.Value).ToList();
+            //var roles2 = User?.Claims
+            //    .Where(c => c.Type == ClaimTypes.Role)
+            //    .Select(c => c.Value)
+            //    .ToList();
+            //return Ok(new { userName, roles, roles2 });
+        }
+*/
 
         [HttpPost("register")]
         public ActionResult<User> Register(UserDto request)
@@ -55,7 +75,9 @@ namespace JwtWebApiDotNet7.Controllers
         {
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.Username)
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Role, "Admin"),
+                new Claim(ClaimTypes.Role, "User")
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
